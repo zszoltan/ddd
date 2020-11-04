@@ -1,0 +1,14 @@
+{
+    "name": "zsitnyanszki/ddd",
+    "description": "Domain-Driven Design lib for Laravel",
+    "type": "library",
+    "license": "LicenseRef-LICENSE",
+    "authors": [
+        {
+            "name": "Zoltan Zsitnyanszki",
+            "email": "nervus6@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
