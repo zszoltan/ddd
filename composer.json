@@ -10,5 +10,17 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+		"php": "^7.0|^8.0"
+	},
+	"autoload": {
+        "psr-4": {
+            "DDD\\": "src/"
+        }
+    },
+	"extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
 }
