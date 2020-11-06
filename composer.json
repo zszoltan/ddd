@@ -11,13 +11,14 @@
         }
     ],
     "require": {
-		"php": "^7.0|^8.0"
+		"php": "^7.0 || ^8.0"
 	},
 	"autoload": {
         "psr-4": {
             "DDD\\": "src/"
         }
     },
-	"minimum-stability": "dev",
-    "prefer-stable": false
+	"config": {
+        "sort-packages": true
+    },
 }
