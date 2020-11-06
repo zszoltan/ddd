@@ -2,7 +2,7 @@
 
 namespace DDD\Query;
 
-class IQuery
+interface IQuery
 {
 
 }
