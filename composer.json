@@ -9,7 +9,7 @@
             "email": "nervus6@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "dev-master",
     "require": {
 		"php": "^7.0|^8.0"
 	},
@@ -20,7 +20,7 @@
     },
 	"extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "develop"
         }
     }
 }
