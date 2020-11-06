@@ -20,10 +20,6 @@ abstract class EventHandler implements IEventHandler
     {
         
     }
-    public function getHandledEventType()
-    {
-        
-    }
     public function handle(IEvent $event)
     {
 
