@@ -6,32 +6,32 @@ use DDD\Bus\IHandlerManager;
 
 class CommandBus implements ICommandBus
 {
-    protected $handlerManager;
-    public function __construct(IHandlerManager $handlerManager)
+    protected $handlers = array();
+    public function __construct()
     {
-        $this->handlerManager = $handlerManager;
+        $this->handlers = array();
     }
-    public function subscribe($commandType, ICommandHandler $commandHandler)
+    public function registerHandler(ICommandHandler $commandHandler)
     {
-        if(!is_subclass_of($commandType,ICommand::class))
-        {
+        if (!is_subclass_of($commandHandler->getHandledCommand(), ICommand::class)) {
             throw new \TypeError("The commandType is not subclass of ICommand");
         }
-        $this->handlerManager->addHandler($commandType, $commandHandler);
+        $this->handlers[$commandHandler->getHandledCommand()] = $commandHandler;
     }
-    public function unsubscribe($commandType,ICommandHandler $commandHandler)
+    public function unregisterHandler(ICommandHandler $commandHandler)
     {
-        if(!is_subclass_of($commandType,ICommand::class))
-        {
-            throw new \TypeError("The commandType is not subclass of ICommand");
+        if (!array_key_exists($commandHandler->getHandledCommand(), $this->_handlers)) {
+            return false;
         }
-        $this->handlerManager->removeHandler($commandType, $commandHandler);
+        unset($this->handlers[$commandHandler->getHandledCommand()]);
+        return true;
     }
     public function publish(ICommand $command)
     {
-        $handlers = $this->handlerManager->getHandlers(get_class($command));
-        foreach ($handlers as $handler) {
-            $handler->handle($command);
+        if (!array_key_exists(get_class($command), $this->_handlers)) {
+            return null;
         }
+        $handler = $this->handlers[get_class($command)];
+        return $handler->handle($command);
     }
 }

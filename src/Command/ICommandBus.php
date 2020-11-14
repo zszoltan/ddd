@@ -5,7 +5,7 @@ namespace DDD\Command;
 interface ICommandBus
 {
 
-    public function subscribe($commandType,ICommandHandler $commandHandler);
-    public function unsubscribe($commandType, ICommandHandler $commandHandler);
+    public function registerHandler(ICommandHandler $commandHandler);
+    public function unregisterHandler(ICommandHandler $commandHandler);
     public function publish(ICommand $command);
 }
