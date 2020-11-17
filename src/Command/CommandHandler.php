@@ -2,7 +2,7 @@
 
 namespace DDD\Command;
 
-abstract class CommandHandler extends ICommandHandler
+abstract class CommandHandler implements ICommandHandler
 {
     private $_handledCommand;
     public function __construct($handledCommandClass)
