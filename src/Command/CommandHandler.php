@@ -9,7 +9,7 @@ abstract class CommandHandler implements ICommandHandler
     {
         if(!is_subclass_of($handledCommandClass,ICommand::class))
         {
-            throw new \TypeError("The handledCommandClass is not subclass of ICommand");
+            throw new \TypeError("The $handledCommandClass is not subclass of ICommand");
         }
         $this->_handledCommand = $handledCommandClass;
     }

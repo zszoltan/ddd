@@ -15,7 +15,7 @@ class EventBus implements IEventBus
     {
         if(!is_subclass_of($eventType,IEvent::class))
         {
-            throw new \TypeError("The eventType is not subclass of IEvent");
+            throw new \TypeError("The $eventType is not subclass of IEvent");
         }
         $this->handlerManager->addHandler($eventType, $eventHandler);
     }
@@ -23,7 +23,7 @@ class EventBus implements IEventBus
     {
         if(!is_subclass_of($eventType,IEvent::class))
         {
-            throw new \TypeError("The eventType is not subclass of IEvent");
+            throw new \TypeError("The $eventType is not subclass of IEvent");
         }
         $this->handlerManager->removeHandler($eventType, $eventHandler);
     }

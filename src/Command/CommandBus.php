@@ -14,7 +14,7 @@ class CommandBus implements ICommandBus
     public function registerHandler(ICommandHandler $commandHandler)
     {
         if (!is_subclass_of($commandHandler->getHandledCommand(), ICommand::class)) {
-            throw new \TypeError("The commandType is not subclass of ICommand");
+            throw new \TypeError("The ".$commandHandler->getHandledCommand()." is not subclass of ICommand");
         }
         $this->handlers[$commandHandler->getHandledCommand()] = $commandHandler;
     }
