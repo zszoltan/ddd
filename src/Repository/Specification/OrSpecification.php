@@ -13,9 +13,8 @@ class OrSpecification extends CompositeSpecification
     }
 
     public function IsSatisfiedBy(ISpecificationProvider $provider)  {
-
-        $provider->isOr();
         $this->leftSpecification->IsSatisfiedBy($provider);
+        $provider->isOr();
         $this->rightSpecification->IsSatisfiedBy($provider);
     }
 }

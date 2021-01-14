@@ -5,38 +5,57 @@ namespace DDD\Repository\Specification;
 class GroupSpecification extends CompositeSpecification
 {
 
+    protected $root;
     protected $specification;
 
     public function __construct()
     {
-        $this->specification = new NullSpecification();
     }
     public function IsSatisfiedBy(ISpecificationProvider $provider)
     {
-        if($this->specification !== null)
-        {
-            $provider->group(function($provider) use($this)
-            {
-                $this->specification->IsSatisfiedBy($provider);
+        if ($this->root !== null) {
+            $provider->group(function ($provider) {
+                $this->root->IsSatisfiedBy($provider);
             });
         }
+
         return true;
     }
-    public function And(ISpecification $specification): ISpecification     
+    public function And(ISpecification $specification): ISpecification
     {
-        $this->specification = new AndSpecification($this->specification, $specification);
-        return $this->specification;
+        if($this->root === null)
+        {
+            $this->specification = new AndSpecification(new NullSpecification(), $specification);
+            $this->root =$this->specification;
+        }
+        else
+        {
+            $newRight = new AndSpecification($this->specification->getRight(), $specification);
+            $this->specification->setRight($newRight);
+            $this->specification=$newRight;
+        }
+        return $this;
     }
-    public function Or(ISpecification $specification) : ISpecification  
+    public function Or(ISpecification $specification): ISpecification
     {
-        $this->specification = new OrSpecification($this->specification, $specification);
-        return $this->specification;
+
+        if($this->root === null)
+        {
+            $this->specification = new OrSpecification(new NullSpecification(), $specification);
+            $this->root =$this->specification;
+        }
+        else
+        {
+            $newRight = new OrSpecification($this->specification->getRight(), $specification);
+            $this->specification->setRight($newRight);
+            $this->specification=$newRight;
+        }
+        return $this;
     }
-   /* public function Not(ISpecification $specification) : ISpecification   
+    /* public function Not(ISpecification $specification) : ISpecification   
     {
         return new NotSpecification($specification);
         $this->specification = new OrSpecification($this->specification, $specification);
         return $this->specification;
     }*/
-
 }
