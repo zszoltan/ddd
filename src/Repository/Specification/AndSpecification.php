@@ -2,7 +2,7 @@
 
 namespace DDD\Repository\Specification;
 
-class AndSpecification extends CompositeSpecification  
+class AndSpecification extends CompositeSpecification
 {
     protected $leftSpecification;
     protected $rightSpecification;
@@ -10,22 +10,23 @@ class AndSpecification extends CompositeSpecification
     public function getRight()
     {
         return $this->rightSpecification;
-
     }
     public function setRight(ISpecification $specification)
     {
-$this->rightSpecification = $specification;
+        $this->rightSpecification = $specification;
     }
 
-    public function __construct(ISpecification $left, ISpecification $right)  {
+    public function __construct(ISpecification $left, ISpecification $right)
+    {
         $this->leftSpecification = $left;
         $this->rightSpecification = $right;
     }
 
-    public function IsSatisfiedBy(ISpecificationProvider $provider)  {
-         
+    public function IsSatisfiedBy(ISpecificationProvider $provider)
+    {
+
         $this->leftSpecification->IsSatisfiedBy($provider);
         $provider->isAnd();
-         $this->rightSpecification->IsSatisfiedBy($provider);
+        $this->rightSpecification->IsSatisfiedBy($provider);
     }
 }

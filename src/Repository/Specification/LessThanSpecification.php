@@ -3,12 +3,12 @@
 namespace DDD\Repository\Specification;
 
 
-class LikeSpecification extends PropertyValueSpecification
+class LessThanSpecification extends PropertyValueSpecification
 {
 
     public function IsSatisfiedBy(ISpecificationProvider $provider)
     {
-        $provider->like($this->getProperty(),$this->getValue());
+        $provider->lessThan($this->getProperty(),$this->getValue());
     }
 
 }

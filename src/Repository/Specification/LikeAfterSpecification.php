@@ -2,13 +2,12 @@
 
 namespace DDD\Repository\Specification;
 
-
-class LikeSpecification extends PropertyValueSpecification
+class LikeAfterSpecification extends LikeSpecification
 {
 
     public function IsSatisfiedBy(ISpecificationProvider $provider)
     {
-        $provider->like($this->getProperty(),$this->getValue());
+      $provider->likeAfter($this->getProperty(),$this->getValue());
     }
 
 }
