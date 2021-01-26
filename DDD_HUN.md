@@ -1,12 +1,14 @@
 # DDD
 
 ## Clean Architekcture (Onion Architecture, Hexagonal Architecture)
-![](clean-architecture.png)
+![](cleen-architecture.png)
 
 ![](onion-architecture.png)
 
 
 ## Építőkockák
+
+### Bounded context
 
 
 ### Entity
@@ -17,16 +19,26 @@ Modósítható
 
 Entity validáció:
 - egy érték esetén pld email setterbe
-- ha az entity-t egyben kell akkor kell egy validátor osztály
+
 ```php
 class City extends Entity
 {
 	$id
 	$name
 	$zip
+...
 
+	protected function setZip($zip)
+	{
+		if(strlen($zip) !== 4)
+			throw new Exception('Írányítószám nem valid');
+			
+		$this->zip = $zip;
+	}
 }
 ```
+
+- ha az entity-t egyben kell akkor kell egy validátor osztály
 
 ```php
 class CityValidator
@@ -35,7 +47,7 @@ class CityValidator
 	{
 		$city2 = $this->cityZipService->getCityFromZip($city->getZip());
 		if($city2 === null || $city->getId() != $city2->getId()
-		return false;
+			return false;
 		return true;
 	}
 }
@@ -73,21 +85,92 @@ class Money
 
 ### Aggregate
 
+Gyökér entity pld rendelés ami rendlés item entity-ket tartalmaz.
+
+A rendelés item entity-knek önnmagukban nincs értelmük (nem tartalmazhatnak bussines logikát) ezért hozzájuk csak egy aggregate-en keresztül lehet hozzáférni.
+
+A repository ilyen Aggregate-tel tér vissza (az OrderItem-hez nem baj ha van repository de csak indokolt esetben)
+
+perzisztálás atomi azaz mind a root entity mind a c
+
+```php
+class OrderItem extends Entity
+{
+	$id;
+	$amount
+	$productId;
+	...
+
+}
+
+
+class Order extends Aggregate
+{
+	$items;
+	$userId;
+	$shopId;
+	...
+	
+	public __construct($userId,$shopId)
+	{
+		$this->setUserId($userId);
+		$this->setShopId($shopId);
+	}
+	
+	
+	public function addItem($productId, $amount)
+	{
+		$this->items->add(new OrderItem($productId, $amount));
+	}
+	
+	...
+
+}
+
+
+class OrderApplicationSerrvice
+{
+
+
+	public function addOrderItemToOrder(OrderItemDto $orderItem)
+	{
+		...
+		// ez példa de nem tökéletes, az komplex példánál a helyes megoldás
+		$order->addItem($orderItem->getProductId(),$orderItem->getAmount());
+		...
+
+	}
+...
+
+}
+
+
+```
+
 ### Repository
 
-Entity-ket add vissza Entity store-okból (pld adatbázis)
+Entity-ket vagy Aggregate-eket rak bele és add vissza halmazból (pld adatbázis)
 
 ### Factory
 
 Factory design pattern
 
+Általában (bonyolult) Aggregete-et állít elő.
+Ha egyszerű az Aggregate azt inkább constructorral állítsuk elő.
+
+
 ### Services
 
 Üzleti logika van
 
-##További Kifejezések
-Dependency injection
-DTO
+### További kifejezések
+
+#### Dependency injection
+
+
+#### DTO - DataTransferObject
+- egyszerű objektumok
+- feladata az adatok továbbítása két réteg között
 
 
 ## Services
@@ -95,20 +178,151 @@ DTO
 
 ### Application Service
 
-Faladata:
+Faladata: ha valaki intterakcióba akar lépni a domainnel ezen keresztűl teheti meg.
+
+Szinte mindig a controllerbe hívom meg.
+Egy DTO-t adok át neki és DTO-t kapok vissza, azért mert a controller-ben nem lehetnek domain dolgok mert semmi köze hozzá (üzelti logika nem a contoller-ben van)
 
 ### Domain Service
 
-Feladata:
+Feladata: Komplex Domain műveleteket végez, paraméterei DDD építőkockák lehetnek és Entity-t vagy Value objectet ad vissza
+
+Akkor használjuk ha,
+- több repository-ból kell adatokat lekérdezni hozzá
+
 
 ### Infrastructure Service
 
-Feladata:
+Feladata: Minden olyan dolog ami az infrastruktúrába tartozik
 
 Példa: 
-EmailInfrastructureService
-Email küldése.
+EmailInfrastructureService- Email küldése.
 
 
+### Komplex példa
 
+```php
+class OrderItem extends Entity
+{
+	$id;
+	$amount
+	$productId;
+	...
+
+}
+
+class User
+{
+	$id;
+	
+	...
+	
+	public function makeOrder($shopId)
+	{
+		return new Order($this->getId(),$shopId);
+	}
+	
+	...
+}
+
+class Order extends Aggregate
+{
+	$items;
+	$userId;
+	$shopId;
+	...
+	
+	public __construct($userId,$shopId)
+	{
+		$this->setUserId($userId);
+		$this->setShopId($shopId);
+	}
+	
+	
+	public function addItem($productId, $amount)
+	{
+		$this->items->add(new OrderItem($productId, $amount));
+	}
+	
+	...
+
+}
+
+
+class OrderApplicationSerrvice
+{
+
+	public function addOrderItemToOrder(OrderItemDto $orderItem)
+	{
+		$order = null;
+		
+		if($orderItem->getOrderId() === null)
+		{
+			$user = $this->getCurrentUser();
+			$order = $user->makeOrder($this->getCurrentShopId());
+		}
+		else
+		{
+			$order = $this->orderRepository->get($orderItem->getOrderId());
+		}
+		if($order === null(
+			throw new OrderDoesNotExistExeption();
+		
+		$order = $this->orderDomainService->addItem($order,$orderItem->getProductId(),$orderItem->getAmount());
+		$response = new OrderResponse();
+		$response->fromDomain($order);
+		return $repsonse;
+
+	}
+	public function orderDone($orderDoneDto $orderDto)
+	{
+	
+		$order = $this->orderRepository->get($orderDto->getId());
+		
+		if($order === null)
+			throw new OrderDoesNotExistExeption();
+	
+		$orderValidator = OrderDoneValidator($order);
+		$orderValidator->validate();
+		
+		$this->orderDomainService->orderDone($order);
+		
+		$this->emailService->sendEmail($this->getCurrentUser()->email, (new OrderEamilPresenter($order))->present());
+	}
+	
+...
+
+}
+
+
+class OrderDomainService
+{
+
+	public function addOrderItemToOrder(Order $order, $productId,  $amount)
+	{
+
+		$product = $this->productRepository->get($productId);
+		
+		if($product === null)
+			throw new ProductNotFoundException();
+		
+		if($product->getStoreAmount() < $amount)
+			throw new ProductNotEnoughInStoreException();
+		
+		
+		$order->addItem($productId, $amount);
+				
+		$this->orderRepository->store($order);
+		
+		$this->productRepository->reservation($productId, $amount,$order->getId());
+		
+		return $order;
+
+	}
+
+
+}
+
+
+```
 
