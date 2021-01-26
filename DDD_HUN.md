@@ -1,6 +1,6 @@
 # DDD
 
-## Clean Architekcture (Onion Architekcture, Hexagonal Architekcture)
+## Clean Architekcture (Onion Architecture, Hexagonal Architecture)
 ![](clean-architecture.png)
 
 ![](onion-architecture.png)
